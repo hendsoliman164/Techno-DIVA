@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأكيد الحجز</title>
+    <!-- PayPal SDK Script -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AWlCMKO6vVm4Lfaqzkk7ztJbVMRKFlIIur83A0o4z1Cmh9DxScO5tNQnGBvQlWNuCkHu4DTL_CGPmpiH"></script>
+    <!-- QR Code Generator Library -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        h1 {
+            color: #ff6347;
+        }
+        .event-details {
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            max-width: 400px;
+            background-color: #333333;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #ff6347;
+        }
+        .form-group input, .form-group select {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ff6347;
+            border-radius: 5px;
+            background-color: #444444;
+            color: #ffffff;
+        }
+        p {
+            color: #ffffff;
+        }
+        #paypal-button-container {
+            margin-top: 20px;
+            background-color: #ff6347;
+            border-radius: 10px;
+            padding: 10px;
+            display: inline-block;
+        }
+        #purchase-button {
+            background-color: #ff6347;
+            border: none;
+            padding: 10px 20px;
+            color: #ffffff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>تأكيد الحجز</h1>
+    <div class="event-details">
+        <h2 id="event-name">MAADI ISLAND</h2>
+        <p><strong>اختر نوع التذكرة:</strong></p>
+        <div class="form-group">
+            <label for="ticket-type">نوع التذكرة:</label>
+            <select id="ticket-type" onchange="updateTotal()">
+                <option value="1200">عادية - 1200 EGP</option>
+                <option value="1600">VIP - 1600 EGP</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="ticket-quantity">عدد التذاكر:</label>
+            <input type="number" id="ticket-quantity" value="1" min="1" max="200" onchange="updateTotal()">
+        </div>
+        <p><strong>إجمالي السعر:</strong> <span id="total-price">1200</span> EGP</p>
+        <button id="purchase-button" onclick="initiatePayment()">شراء تذكرة</button>
+        <div id="paypal-button-container" style="display: none;"></div>
+    </div>
+
+    <div id="qr-code" style="display: none;">
+        <h3>رمز QR للدخول:</h3>
+        <div id="qr"></div>
+    </div>
+
+    <script>
+        let remainingTickets = 200;
+
+        // Update total price based on ticket type and quantity
+        function updateTotal() {
+            const ticketType = document.getElementById('ticket-type').value;
+            const quantity = document.getElementById('ticket-quantity').value;
+            const totalPrice = ticketType * quantity;
+            document.getElementById('total-price').textContent = totalPrice;
+
+            if (quantity > remainingTickets) {
+                alert('العدد المطلوب يتجاوز التذاكر المتبقية!');
+                document.getElementById('ticket-quantity').value = remainingTickets;
+                updateTotal();
+            }
+        }
+
+        // Function to initiate payment process when "شراء تذكرة" is clicked
+        function initiatePayment() {
+            document.getElementById('purchase-button').style.display = 'none';  // Hide purchase button
+            document.getElementById('paypal-button-container').style.display = 'block'; // Show PayPal button
+        }
+
+        // PayPal integration
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                const ticketType = document.getElementById('ticket-type').value;
+                const quantity = document.getElementById('ticket-quantity').value;
+                const totalPrice = ticketType * quantity;
+                const typeText = ticketType == 1200 ? 'عادية' : 'VIP';
+
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: totalPrice.toString()
+                        },
+                        description: `MAADI ISLAND - تذاكر ${typeText} (${quantity} تذكرة)`
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    const ticketType = document.getElementById('ticket-type').value;
+                    const quantity = document.getElementById('ticket-quantity').value;
+                    const typeText = ticketType == 1200 ? 'عادية' : 'VIP';
+
+                    remainingTickets -= quantity; // Deduct reserved tickets
+                    alert(`تم الدفع بنجاح! التذاكر المتبقية: ${remainingTickets}`);
+
+                    // Generate QR code upon successful payment
+                    const ticketNumber = Math.floor(Math.random() * 100000); // Unique Ticket Number
+                    const qrCodeData = `رقم التذكرة: ${ticketNumber} | الفعالية: MAADI ISLAND | التاريخ: 15/01/2025 | التذاكر: ${quantity} | النوع: ${typeText}`;
+                    generateQRCode(qrCodeData);
+                });
+            },
+            onError: function(err) {
+                console.error(err);
+                alert('حدث خطأ أثناء إتمام الدفع.');
+            }
+        }).render('#paypal-button-container');
+
+        // Generate QR Code
+        function generateQRCode(data) {
+            document.getElementById('qr-code').style.display = 'block'; // Show QR Code section
+            const qr = new QRCode(document.getElementById("qr"), {
+                text: data,
+                width: 128,
+                height: 128,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.L
+            });
+        }
+    </script>
+</body>
+</html>

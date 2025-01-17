@@ -1,0 +1,113 @@
+/* Reset بعض التنسيقات الأساسية */
+body, h1, h2, h3, p, ul, li, a {
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style: none;
+  font-family: Arial, sans-serif;
+}
+
+/* إعدادات الصفحة العامة */
+body {
+  background-color: #f9f9f9;
+  color: #333;
+  line-height: 1.6;
+  padding: 0 10px;
+}
+
+/* الشعار والقائمة */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #222;
+  color: #fff;
+  padding: 10px 20px;
+}
+
+header .logo h1 {
+  font-size: 24px;
+}
+
+header nav ul {
+  display: flex;
+  gap: 15px;
+}
+
+header nav a {
+  color: #fff;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+header nav a:hover {
+  color: #ff6600;
+}
+
+/* قسم الأحداث */
+#events {
+  margin: 20px 0;
+}
+
+#events h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.event {
+  background: #fff;
+  margin: 10px auto;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.event:hover {
+  transform: translateY(-10px);
+}
+
+.event img {
+  max-width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.event h3 {
+  margin: 10px 0;
+  font-size: 20px;
+  color: #222;
+}
+
+.event button {
+  background: #ff6600;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.event button:hover {
+  background: #cc5200;
+}
+
+/* تحسين التصميم للأجهزة الصغيرة */
+@media screen and (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  header nav ul {
+    flex-direction: column;
+  }
+
+  .event {
+    max-width: 90%;
+  }
+}
