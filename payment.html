@@ -64,6 +64,10 @@
             cursor: pointer;
             border-radius: 5px;
         }
+        #qr-code {
+            margin-top: 20px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -74,8 +78,8 @@
         <div class="form-group">
             <label for="ticket-type">نوع التذكرة:</label>
             <select id="ticket-type" onchange="updateTotal()">
-                <option value="1200">عادية - 1200 EGP</option>
-                <option value="1600">VIP - 1600 EGP</option>
+                <option value="1200">Regular - 1000 EGP</option>
+                <option value="1600">VIP - 1500 EGP</option>
             </select>
         </div>
         <div class="form-group">
@@ -87,7 +91,7 @@
         <div id="paypal-button-container" style="display: none;"></div>
     </div>
 
-    <div id="qr-code" style="display: none;">
+    <div id="qr-code">
         <h3>رمز QR للدخول:</h3>
         <div id="qr"></div>
     </div>
@@ -143,8 +147,9 @@
 
                     // Generate QR code upon successful payment
                     const ticketNumber = Math.floor(Math.random() * 100000); // Unique Ticket Number
-                    const qrCodeData = `رقم التذكرة: ${ticketNumber} | الفعالية: MAADI ISLAND | التاريخ: 15/01/2025 | التذاكر: ${quantity} | النوع: ${typeText}`;
-                    generateQRCode(qrCodeData);
+                    const buyerCode = 'ABC' + Math.floor(Math.random() * 10000); // Random buyer code
+                    const qrCodeData = `رقم التذكرة: ${ticketNumber} | كود المشتري: ${buyerCode} | الفعالية: MAADI ISLAND | التاريخ: 15/01/2025 | التذاكر: ${quantity} | النوع: ${typeText}`;
+                    generateQRCode(qrCodeData);  // Show QR code
                 });
             },
             onError: function(err) {
